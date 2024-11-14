@@ -14,7 +14,7 @@ final bleman = AllBluetooth();
 class BluetoothManager {
 
   bool getBluetoothState(){
-
+    return true;
   }
 
 

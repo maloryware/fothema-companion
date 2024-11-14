@@ -12,7 +12,7 @@ class Page {
 class Pages {
   var gestures = Page(Icons.waving_hand, Placeholder());
   var modules = Page(Icons.account_tree_sharp, Placeholder());
-  var add  = Page(Icons.add, PageAdd());
+  var add  = Page(Icons.add, AddDevicePage());
   var mirror = Page(Icons.rectangle_outlined, Placeholder());
   var settings = Page(Icons.settings, Placeholder());
 }
