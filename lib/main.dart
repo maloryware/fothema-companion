@@ -1,10 +1,9 @@
 
 import 'dart:async';
 
-import 'package:all_bluetooth/all_bluetooth.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:fothema_companion/fothema/consts.dart';
+import 'package:fothema_companion/consts.dart';
 
 
 

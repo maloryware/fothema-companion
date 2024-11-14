@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fothema_companion/fothema/pages/page_add.dart';
+import 'package:fothema_companion/pages/page_add.dart';
 
 
 class Page {
