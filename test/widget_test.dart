@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fothema_companion/fothema/home.dart';
+import 'package:fothema_companion/fothema/main.dart';
 
 
 void main() {

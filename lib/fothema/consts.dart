@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fothema_companion/fothema/pages/page_add.dart';
 
 
 class Page {
@@ -11,7 +12,7 @@ class Page {
 class Pages {
   var gestures = Page(Icons.waving_hand, Placeholder());
   var modules = Page(Icons.account_tree_sharp, Placeholder());
-  var add  = Page(Icons.add, Placeholder());
+  var add  = Page(Icons.add, PageAdd());
   var mirror = Page(Icons.rectangle_outlined, Placeholder());
   var settings = Page(Icons.settings, Placeholder());
 }
