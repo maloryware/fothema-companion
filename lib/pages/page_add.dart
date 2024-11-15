@@ -48,35 +48,37 @@ class _AddDevicePageState extends State<AddDevicePage>{
   void asyncInitState() async {
 
     await isBTPermissionGiven();
+      UniversalBle.onAvailabilityChange = (state) {
+          setState(() async {
+            switch (state) {
+              case AvailabilityState.unknown:
+              case AvailabilityState.unsupported:
+              case AvailabilityState.unauthorized:
+                _noPerms = true;
+              case AvailabilityState.poweredOff:
+                _isBluetoothOn = false;
+                _isChecking = false;
+                _noPerms = false;
+              case AvailabilityState.resetting:
+                asyncInitState();
+              case AvailabilityState.poweredOn:
+                _isBluetoothOn = true;
+                _isChecking = false;
+                _noPerms = false;
 
-    setState(() {
-
-
-      UniversalBle.onAvailabilityChange = (state) async {
-        switch(state){
-
-          case AvailabilityState.unknown:
-          case AvailabilityState.resetting:
-          case AvailabilityState.unsupported:
-          case AvailabilityState.unauthorized:
-            await isBTPermissionGiven();
-            _noPerms = true;
-          case AvailabilityState.poweredOff:
-            _isBluetoothOn = false;
-            _isChecking = false;
-          case AvailabilityState.poweredOn:
-            _isBluetoothOn = true;
-            _isChecking = false;
-        }
+            }
+          });
       };
 
       UniversalBle.onScanResult = (device) {
-        devices.add(device);
+        setState(() {
+          devices.add(device);
+        });
       };
 
 
-    });
-  }
+    }
+
 
   @override
   void initState() {
@@ -95,33 +97,60 @@ class _AddDevicePageState extends State<AddDevicePage>{
       return Center(child: Text(failStateText));
     }
 
-    return Scaffold(
-
-      body: Stack(
-          children: [
-            Column(
+    return Builder(
+      builder: (context) {
+        return Column(
               children: [
-                  for(var device in devices)
-                    ExpansionTile(
-                      leading: Icon(Icons.bluetooth),
-                      title: Text(device.toString()),
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: null,
-                          icon: Icon(Icons.play_arrow_outlined),
-                          label: Text("Connect")
-                        )]
-                      )]),
-            Padding(padding: EdgeInsets.only(top: 40)),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 40),
-              child: Align(alignment: Alignment.bottomCenter, child: ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), )),
-            ),
-          ]
-
-
-      ),
-
+                Expanded(
+                  child: ListView(
+                    children: [
+                        for(var device in devices)
+                          ExpansionTile(
+                            leading: Icon(Icons.bluetooth),
+                            title: Text(device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId),
+                            subtitle: Text(device.rssi.toString()),
+                            //* Contents of the expanded item go below
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: Align(alignment: Alignment.centerLeft, child: Text(device.isPaired! ? "Paired" : "Not paired" )),
+                              ),
+                              Row(
+                                children: [
+                                  Padding(padding: EdgeInsets.only(left: 5)),
+                                  ElevatedButton.icon(
+                                    onPressed: null,
+                                    icon: Icon(Icons.play_arrow_outlined),
+                                    label: Text("Connect")
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: null,
+                                    icon: Icon(Icons.connect_without_contact),
+                                    label: Text("Pair")
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () => print(device.toString()),
+                                    icon: Icon(Icons.bug_report),
+                                    label: Text("Print device info")
+                                  ),
+                                ]
+                              ),
+                            ]
+                          )
+                    ]
+                  ),
+                ),
+               ConstrainedBox(
+                   constraints: const BoxConstraints(maxHeight: 5, minHeight: 5),
+                   child: SizedBox(width: 1, height: 1,)),
+               ConstrainedBox(constraints: const BoxConstraints(minHeight: 10),
+               child: Padding(
+                 padding: const EdgeInsets.only(bottom: 25.0),
+                 child: ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
+               )),
+              ]
+        );
+      }
     );
   }
 
