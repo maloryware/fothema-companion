@@ -7,10 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:fothema_companion/consts.dart';
 
 void main() {
-
   runApp(Home());
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-
 }
 
 
@@ -19,10 +17,26 @@ class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomeState();
+  State<StatefulWidget> createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

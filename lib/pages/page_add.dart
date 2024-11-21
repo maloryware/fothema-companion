@@ -20,7 +20,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
   var _isBluetoothOn = false;
   String failStateText = "";
   List<BleDevice> devices = [];
-  AvailabilityState lastState = AvailabilityState.unknown;
+  AvailabilityState lastState = AvailabilityState.poweredOn;
 
   bool failState(){
     return _noPerms || _isChecking || !_isBluetoothOn;
@@ -53,6 +53,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
     UniversalBle.onAvailabilityChange = (state) {
       setState(() async {
         switch (state) {
+          case AvailabilityState.resetting:
           case AvailabilityState.unknown:
           case AvailabilityState.unsupported:
           case AvailabilityState.unauthorized:
@@ -61,8 +62,6 @@ class _AddDevicePageState extends State<AddDevicePage>{
             _isBluetoothOn = false;
             _isChecking = false;
             _noPerms = false;
-          case AvailabilityState.resetting:
-            asyncInitState();
           case AvailabilityState.poweredOn:
             _isBluetoothOn = true;
             _isChecking = false;
@@ -154,8 +153,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(onPressed: () => UniversalBle.startScan, child: Text("Scan"), ),
-                      ElevatedButton(onPressed: () => UniversalBle.stopScan, child: Text("Stop"), ),
+                      ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
+                      ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                       ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
                       ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                     ],
@@ -184,8 +183,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(onPressed: () => UniversalBle.startScan, child: Text("Scan"), ),
-                        ElevatedButton(onPressed: () => UniversalBle.stopScan, child: Text("Stop"), ),
+                        ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
+                        ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                         ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
                         ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                       ],
@@ -250,8 +249,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
                    child: Row(
                      mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       ElevatedButton(onPressed: () => UniversalBle.startScan, child: Text("Scan"), ),
-                       ElevatedButton(onPressed: () => UniversalBle.stopScan, child: Text("Stop"), ),
+                       ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
+                       ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                        ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
                        ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                      ],

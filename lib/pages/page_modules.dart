@@ -14,6 +14,7 @@ class ModulesPage extends StatefulWidget {
 class _ModulesPageState extends State<ModulesPage> {
 
   bool connected = false;
+  AvailabilityState lastState = AvailabilityState.poweredOn;
 
   void asyncInitState() async {
 
@@ -22,14 +23,23 @@ class _ModulesPageState extends State<ModulesPage> {
 
         if(didConnect){
           connected = didConnect;
+          Blecomm.getConfig();
           Blecomm.availableServices = await UniversalBle.discoverServices(deviceId);
         }
 
       });
     };
+
     UniversalBle.onValueChange = (deviceId, characteristicId, value){
       print("Characteristic value changed:\n$deviceId,\n$characteristicId,\n$value");
 
+    };
+
+    UniversalBle.onAvailabilityChange = (state) {
+      setState(() async {
+        if(lastState != state) print(state);
+        lastState = state;
+      });
     };
 
   }
@@ -43,6 +53,7 @@ class _ModulesPageState extends State<ModulesPage> {
 
   var activeModules = [];
   var inactiveModules = [];
+
 
   @override
   Widget build(BuildContext context) {
