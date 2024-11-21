@@ -20,6 +20,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
   var _isBluetoothOn = false;
   String failStateText = "";
   List<BleDevice> devices = [];
+  AvailabilityState lastState = AvailabilityState.unknown;
 
   bool failState(){
     return _noPerms || _isChecking || !_isBluetoothOn;
@@ -68,7 +69,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
             _noPerms = false;
 
         }
-        print(state);
+        if(lastState != state) print(state);
+        lastState = state;
       });
     };
 
@@ -248,8 +250,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
                    child: Row(
                      mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       ElevatedButton(onPressed: () => setState(UniversalBle.startScan), child: Text("Scan"), ),
-                       ElevatedButton(onPressed: () => UniversalBle.stopScan(), child: Text("Stop"), ),
+                       ElevatedButton(onPressed: () => UniversalBle.startScan, child: Text("Scan"), ),
+                       ElevatedButton(onPressed: () => UniversalBle.stopScan, child: Text("Stop"), ),
                        ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
                        ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                      ],

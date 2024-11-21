@@ -3,15 +3,13 @@ import 'dart:async';
 
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fothema_companion/consts.dart';
-
-
-
 
 void main() {
 
-
   runApp(Home());
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
 
 }
 
@@ -25,9 +23,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
-
-
 
   @override
   Widget build(BuildContext context) {
