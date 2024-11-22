@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
 import 'package:universal_ble/universal_ble.dart';
@@ -13,8 +10,6 @@ class ModulesPage extends StatefulWidget {
 
 class _ModulesPageState extends State<ModulesPage> {
 
-  bool connected = false;
-  AvailabilityState lastState = AvailabilityState.poweredOn;
 
   void asyncInitState() async {
 
@@ -23,8 +18,8 @@ class _ModulesPageState extends State<ModulesPage> {
 
         if(didConnect){
           connected = didConnect;
-          Blecomm.getConfig();
-          Blecomm.availableServices = await UniversalBle.discoverServices(deviceId);
+          getConfig();
+          availableServices = await UniversalBle.discoverServices(deviceId);
         }
 
       });
@@ -51,14 +46,10 @@ class _ModulesPageState extends State<ModulesPage> {
   }
 
 
-  var activeModules = [];
-  var inactiveModules = [];
-
-
   @override
   Widget build(BuildContext context) {
 
-    return connected ? Container(alignment: Alignment.center, child: Text("Not connected.")):
+    return !connected ? Container(alignment: Alignment.center, child: Text("Not connected.")):
 
     Column(
       children: [
@@ -80,7 +71,10 @@ class _ModulesPageState extends State<ModulesPage> {
         ),
 
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
-          ElevatedButton(onPressed: () => print(Blecomm.availableServices), child: Text("Fetch services")),
+          ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
+          ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: getConfig, label: Text("getConfig")),
         ),
       ],
     );

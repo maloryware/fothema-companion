@@ -22,22 +22,6 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -80,4 +64,5 @@ class HomeState extends State<Home> {
         )
     );
   }
+
 }

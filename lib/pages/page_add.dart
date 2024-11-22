@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fothema_companion/bluetooth.dart';
 import 'package:universal_ble/universal_ble.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,16 +15,10 @@ class AddDevicePage extends StatefulWidget {
 
 
 class _AddDevicePageState extends State<AddDevicePage>{
-  List<BleDevice> connectedDevices = [];
-  var _noPerms = false;
-  var _isChecking = false;
-  var _isBluetoothOn = false;
-  String failStateText = "";
-  List<BleDevice> devices = [];
-  AvailabilityState lastState = AvailabilityState.poweredOn;
+
 
   bool failState(){
-    return _noPerms || _isChecking || !_isBluetoothOn;
+    return noPerms || isChecking || !isBluetoothOn;
   }
 
   Future<bool> isBTPermissionGiven() async {
@@ -57,16 +52,15 @@ class _AddDevicePageState extends State<AddDevicePage>{
           case AvailabilityState.unknown:
           case AvailabilityState.unsupported:
           case AvailabilityState.unauthorized:
-            _noPerms = true;
+            isChecking = true;
           case AvailabilityState.poweredOff:
-            _isBluetoothOn = false;
-            _isChecking = false;
-            _noPerms = false;
+            isBluetoothOn = false;
+            isChecking = false;
+            noPerms = false;
           case AvailabilityState.poweredOn:
-            _isBluetoothOn = true;
-            _isChecking = false;
-            _noPerms = false;
-
+            isBluetoothOn = true;
+            isChecking = false;
+            noPerms = false;
         }
         if(lastState != state) print(state);
         lastState = state;
@@ -76,25 +70,27 @@ class _AddDevicePageState extends State<AddDevicePage>{
     UniversalBle.onScanResult = (device) {
       setState(() {
         bool willAdd = true;
+        List<BleDevice> selectedList = [];
 
-        if(device.name == null) return;
+        selectedList = device.name == null ? hiddenDevices : devices;
 
-        if(devices.isEmpty) {
+        if(selectedList.isEmpty) {
           print("Adding device $device");
-          devices.add(device);
+          selectedList.add(device);
           willAdd = false;
         }
 
-        else for(BleDevice presentDevice in devices){
+        else for(BleDevice presentDevice in selectedList){
           if(presentDevice.deviceId == device.deviceId) {
             willAdd = false;
             break;
           }
         }
         if(willAdd) {
-          devices.add(device);
+          selectedList.add(device);
         }
-        devices.sort((a, b) {
+
+        selectedList.sort((a, b) {
           var x = b.rssi!.compareTo(a.rssi as num);
           return x;
         });
@@ -103,18 +99,21 @@ class _AddDevicePageState extends State<AddDevicePage>{
 
 
 
-    UniversalBle.onConnectionChange = (deviceId, connected, err) {
+    UniversalBle.onConnectionChange = (callbackDeviceId, didConnect, err) {
       setState(() {
-        print("Connection state changed. DeviceId: $deviceId, Connected: $connected, Err: $err");
+        print("Connection state changed. DeviceId: $callbackDeviceId, Connected: $didConnect, Err: $err");
 
-        for (var device in devices){
+        connected = didConnect;
+        deviceId = callbackDeviceId;
+
+        for (BleDevice device in devices){
           if(device.deviceId == deviceId && !connected && connectedDevices.contains(device)){
             connectedDevices.remove(device);
-            print("Removed device from connectedDevices");
+            print("Removed device [$device] from connectedDevices");
           }
           if(device.deviceId == deviceId && connected && !connectedDevices.contains(device)){
             connectedDevices.add(device);
-            print("Added device to connectedDevices");
+            print("Added device [$device] to connectedDevices");
           }
         }
       });
@@ -132,11 +131,10 @@ class _AddDevicePageState extends State<AddDevicePage>{
   @override
   Widget build(BuildContext context) {
 
-
     if(failState()){
-      if (_noPerms) failStateText = "Please provide bluetooth permissions.";
-      else if (_isChecking) failStateText = "Checking...";
-      else if (!_isBluetoothOn) failStateText = "Bluetooth disabled.";
+      if (noPerms) failStateText = "Please provide bluetooth permissions.";
+      else if (isChecking) failStateText = "Checking...";
+      else if (!isBluetoothOn) failStateText = "Bluetooth disabled.";
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +144,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
                 constraints: const BoxConstraints(maxHeight: 5, minHeight: 5),
                 child: SizedBox(width: 1, height: 1,)
             ),
-            if(!_isBluetoothOn && !_isChecking && !_noPerms)
+            if(!isBluetoothOn && !isChecking && !noPerms)
             ConstrainedBox(constraints: const BoxConstraints(minHeight: 10),
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 25.0),
@@ -168,7 +166,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
 
     return Builder(
       builder: (context) {
-        if(devices.isEmpty) return Center(
+        if(devices.isEmpty && hiddenDevices.isEmpty) return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -202,8 +200,11 @@ class _AddDevicePageState extends State<AddDevicePage>{
                         for(var device in devices)
                           ExpansionTile(
                             leading: Icon(Icons.bluetooth),
-                            title: Text(device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId),
+                            title: Text(
+                                device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId,
+                                style: connectedDevices.contains(device) ? TextStyle(color: Colors.green) : TextStyle()),
                             subtitle: Text("Connectivity: ${145 + device.rssi! < 100 ? 145 + device.rssi! : 100}%"),
+
                             //* Contents of the expanded item go below
                             children: [
                               Padding(
@@ -235,7 +236,51 @@ class _AddDevicePageState extends State<AddDevicePage>{
                                 ]
                               ),
                             ]
-                          )
+                          ),
+                      if(hiddenDevices.isNotEmpty)
+                        ExpansionTile(
+                          title: Text("Hidden devices"),
+                          children: [
+                            for(var device in hiddenDevices)
+                              ExpansionTile(
+                                  leading: Icon(Icons.bluetooth),
+                                  title: Text(device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId),
+                                  subtitle: Text("Connectivity: ${145 + device.rssi! < 100 ? 145 + device.rssi! : 100}%"),
+                                  //* Contents of the expanded item go below
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Align(alignment: Alignment.centerLeft, child: Text(
+                                          connectedDevices.contains(device) ? "Connected" :
+                                          device.isPaired! ? "Paired" : "Not paired" )
+                                      ),
+                                    ),
+                                    Row(
+                                        children: [
+                                          Padding(padding: EdgeInsets.only(left: 5)),
+                                          ElevatedButton.icon(
+                                              onPressed: connectedDevices.contains(device) ? null : () => UniversalBle.connect(device.deviceId),
+                                              icon: Icon(Icons.play_arrow_outlined),
+                                              label: Text("Connect")
+                                          ),
+
+                                          ElevatedButton.icon(
+                                              onPressed:  device.isPaired! ? null : () => UniversalBle.pair(device.deviceId),
+                                              icon: Icon(Icons.connect_without_contact),
+                                              label: Text("Pair")
+                                          ),
+                                          ElevatedButton.icon(
+                                              onPressed: () => print(device.toString()),
+                                              icon: Icon(Icons.bug_report),
+                                              label: Text("Print device info")
+                                          ),
+                                        ]
+                                    ),
+                                  ]
+                              ),
+                          ],
+                        )
+
                     ]
                   ),
                 ),
