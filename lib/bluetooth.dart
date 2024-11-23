@@ -43,12 +43,15 @@ Future<Map<String, dynamic>> getConfig() async {
 }
 
 void defineService() {
+  bool _success = false;
   for(var serv in availableServices){
     if (BleUuidParser.compareStrings(BleUuidParser.string(serv.uuid), core_service)){
       service = serv.uuid;
+      _success = true;
       break;
     }
   }
+  if(!_success) print("Unable to locate proper service. Is your mirror running the FOTHEMA Server?");
 }
 
 void updateConfig(Map<String, dynamic> config){
