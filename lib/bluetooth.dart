@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:universal_ble/universal_ble.dart';
 
 
-const service = "4138";
+const core_service = "4138";
 const ping = "413A";
 const get = "413B";
 const send = "413C";
 const backup = "413D";
+const connect = "413E";
 
+String service = "";
 Map<String, dynamic> config = {};
 Map<String, dynamic> modules = {};
 List<BleService> availableServices = [];
@@ -40,6 +42,15 @@ Future<Map<String, dynamic>> getConfig() async {
   return config;
 }
 
+void defineService() {
+  for(var serv in availableServices){
+    if (BleUuidParser.compareStrings(BleUuidParser.string(serv.uuid), core_service)){
+      service = serv.uuid;
+      break;
+    }
+  }
+}
+
 void updateConfig(Map<String, dynamic> config){
   UniversalBle.writeValue(deviceId, service, send, utf8.encode(jsonEncode(config)), BleOutputProperty.withResponse);
 }
@@ -47,3 +58,9 @@ void updateConfig(Map<String, dynamic> config){
 void backupConfig(){
   UniversalBle.writeValue(deviceId, service, backup, utf8.encode("1") /*utf8.encode(jsonEncode(config))*/, BleOutputProperty.withResponse);
 }
+
+void pingServer(){
+  print(UniversalBle.readValue(deviceId, service, connect));
+}
+
+

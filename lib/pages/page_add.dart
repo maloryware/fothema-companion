@@ -100,7 +100,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
 
 
     UniversalBle.onConnectionChange = (callbackDeviceId, didConnect, err) {
-      setState(() {
+      setState(() async {
         print("Connection state changed. DeviceId: $callbackDeviceId, Connected: $didConnect, Err: $err");
 
         connected = didConnect;
@@ -113,6 +113,8 @@ class _AddDevicePageState extends State<AddDevicePage>{
           }
           if(device.deviceId == deviceId && connected && !connectedDevices.contains(device)){
             connectedDevices.add(device);
+            availableServices = await UniversalBle.discoverServices(deviceId);
+            defineService();
             print("Added device [$device] to connectedDevices");
           }
         }
