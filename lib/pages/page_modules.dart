@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
+import 'package:fothema_companion/widget/modules_box.dart';
 import 'package:universal_ble/universal_ble.dart';
+
+import '../config.dart';
 
 class ModulesPage extends StatefulWidget {
   @override
@@ -13,17 +16,9 @@ class _ModulesPageState extends State<ModulesPage> {
 
   void asyncInitState() async {
 
-    UniversalBle.onConnectionChange = (deviceId, didConnect, err) {
-      setState(() async {
-
-        if(didConnect){
-          connected = didConnect;
-          getConfig();
-          availableServices = await UniversalBle.discoverServices(deviceId);
-        }
-
-      });
-    };
+    if(modules.isEmpty) {
+      getConfig();
+    }
 
     UniversalBle.onValueChange = (deviceId, characteristicId, value){
       print("Characteristic value changed:\n$deviceId,\n$characteristicId,\n$value");
@@ -54,21 +49,8 @@ class _ModulesPageState extends State<ModulesPage> {
     Column(
       children: [
 
-        ExpansionTile(title: Text("Active"),
-          childrenPadding: EdgeInsets.all(8.0),
-          children: [
-
-            if(activeModules.isEmpty) Text("No active modules.", style: TextStyle(color: Colors.grey))
-          ],
-          // list active modules from config
-        ),
-        ExpansionTile(title: Text("Available"),
-          childrenPadding: EdgeInsets.all(8.0),
-          children: [
-            if(inactiveModules.isEmpty) Text("No inactive modules.", style: TextStyle(color: Colors.grey))
-          ],
-          // list inactive modules from config
-        ),
+        ModulesBox(moduleType: ModuleType.ACTIVE),
+        ModulesBox(moduleType: ModuleType.INACTIVE),
 
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
           ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),

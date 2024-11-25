@@ -1,10 +1,33 @@
 
-import 'dart:async';
 
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fothema_companion/consts.dart';
+import 'package:fothema_companion/pages/page_add.dart';
+import 'package:fothema_companion/pages/page_gestures.dart';
+import 'package:fothema_companion/pages/page_mirror.dart';
+import 'package:fothema_companion/pages/page_modules.dart';
+import 'package:fothema_companion/pages/page_settings.dart';
+
+/// boilerplate defs *
+
+typedef JsonObj = Map<String, dynamic>;
+class Page {
+  final IconData icon;
+  final Widget widget;
+  Page(this.icon, this.widget);
+}
+class Pages {
+  var gestures = Page(Icons.waving_hand, GesturesPage());
+  var modules = Page(Icons.account_tree_sharp, ModulesPage());
+  var add  = Page(Icons.add, AddDevicePage());
+  var mirror = Page(Icons.rectangle_outlined, MirrorPage());
+  var settings = Page(Icons.settings, SettingsPage());
+}
+//* defines the home page (index)
+const int homePage = 2;
+
+/// end boilerplate defs *
 
 void main() {
   runApp(Home());
