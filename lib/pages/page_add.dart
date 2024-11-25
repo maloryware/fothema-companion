@@ -262,9 +262,9 @@ class _AddDevicePageState extends State<AddDevicePage>{
                                         children: [
                                           Padding(padding: EdgeInsets.only(left: 5)),
                                           ElevatedButton.icon(
-                                              onPressed: connectedDevices.contains(device) ? null : () => UniversalBle.connect(device.deviceId),
+                                              onPressed: connectedDevices.contains(device) ? () => UniversalBle.disconnect(connectedDevices.first.deviceId) : () => UniversalBle.connect(device.deviceId),
                                               icon: Icon(Icons.play_arrow_outlined),
-                                              label: Text("Connect")
+                                              label: Text(connectedDevices.contains(device) ? "Disconnect" : "Connect")
                                           ),
 
                                           ElevatedButton.icon(
