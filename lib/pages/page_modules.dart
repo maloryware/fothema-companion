@@ -18,6 +18,7 @@ class _ModulesPageState extends State<ModulesPage> {
 
     if(modules.isEmpty) {
       getConfig();
+      print("getConfig() called by page_modules.dart");
     }
 
     UniversalBle.onValueChange = (deviceId, characteristicId, value){
@@ -46,19 +47,21 @@ class _ModulesPageState extends State<ModulesPage> {
 
     return !connected ? Container(alignment: Alignment.center, child: Text("Not connected.")):
 
-    Column(
-      children: [
+    Builder(
+      builder: (context) => Column(
+        children: [
 
-        ModulesBox(moduleType: ModuleType.ACTIVE),
-        ModulesBox(moduleType: ModuleType.INACTIVE),
+          ModulesBox(moduleType: ModuleType.ACTIVE),
+          ModulesBox(moduleType: ModuleType.INACTIVE),
 
-        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
-          ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
-        ),
-        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
-          ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: getConfig, label: Text("getConfig")),
-        ),
-      ],
+          ConstrainedBox(constraints: const BoxConstraints(minHeight: 10, maxHeight: 30), child:
+            ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
+          ),
+          ConstrainedBox(constraints: const BoxConstraints(minHeight: 10, maxHeight: 30), child:
+            ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: getConfig, label: Text("getConfig")),
+          ),
+        ],
+      ),
     );
 
 

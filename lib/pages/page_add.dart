@@ -115,6 +115,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
             connectedDevices.add(device);
             availableServices = await UniversalBle.discoverServices(deviceId);
             getConfig();
+            print("getConfig() called by page_add.dart");
             defineService();
             print("Added device [$device] to connectedDevices");
           }
@@ -157,7 +158,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
                       ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
                       ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                       ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
-                      ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
+                      ElevatedButton(onPressed: () {for(var device in devices) print(device.deviceId); }, child: Text("Get list"), ),
                     ],
                   ),
                 )

@@ -65,8 +65,8 @@ class ModulesBox extends ExpansionTile{
 
 class _ModuleBoxState extends State<ModulesBox>{
 
-  late List<MMModule> activeModules;
-  late List<MMModule> inactiveModules;
+  List<MMModule> activeModules = [];
+  List<MMModule> inactiveModules = [];
 
   void toggleModule(MMModule module, bool newVal){
 
@@ -93,9 +93,9 @@ class _ModuleBoxState extends State<ModulesBox>{
   void initState() {
 
     super.initState();
-    for(MMModule mod in modules) {
+    for(var mod in modules) {
       if(mod.title == "alert") continue;
-      mod.pos.isEmpty ? activeModules.add(mod) : inactiveModules.add(mod);
+      mod.pos.isEmpty ? activeModules.add(mod as MMModule) : inactiveModules.add(mod as MMModule);
     }
   }
 
@@ -103,27 +103,31 @@ class _ModuleBoxState extends State<ModulesBox>{
   Widget build(BuildContext context) {
     var modules = widget.moduleType == ModuleType.ACTIVE ? activeModules : inactiveModules;
 
-    return ExpansionTile(
-      title: Text(widget.moduleType == ModuleType.ACTIVE ? "Active" : "Inactive"),
-      children: [
-        for(MMModule module in modules)
-          Row(
-            children: [
-              Flex(direction: Axis.vertical, children: [Switch(value: activeModules.contains(module), onChanged: (changed) => toggleModule(module, changed))],),
-              ExpansionTile(
-                title: Text(module.displayText.isNotEmpty ? module.displayText : module.title),
-                children: [
-
+    return Expanded(
+      child: ExpansionTile(
+        title: Text(widget.moduleType == ModuleType.ACTIVE ? "Active" : "Inactive"),
+        children: [
+            ListView(
+              children: [
+                for(MMModule module in modules)
                   Row(
+                    children: [
+                      Flex(direction: Axis.vertical, children: [Switch(value: activeModules.contains(module), onChanged: (changed) => toggleModule(module, changed))],),
+                      ExpansionTile(
+                        title: Text(module.displayText.isNotEmpty ? module.displayText : module.title),
+                        childrenPadding: EdgeInsets.only(left: 3.0),
+                        children: [
+                          Text(module.displayText),
+                          Text(module.pos)
+                        ],)
+                    ],
+                  ),
+              ]
+            )
 
-                  )
-                ],
-                childrenPadding: EdgeInsets.only(left: 3.0),)
-            ],
-          )
-          
-        ]
-      );
+          ]
+        ),
+    );
 
 
   }
