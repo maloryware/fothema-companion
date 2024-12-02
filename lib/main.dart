@@ -1,5 +1,7 @@
 
 
+import 'dart:io';
+
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,11 @@ import 'package:fothema_companion/pages/page_gestures.dart';
 import 'package:fothema_companion/pages/page_mirror.dart';
 import 'package:fothema_companion/pages/page_modules.dart';
 import 'package:fothema_companion/pages/page_settings.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:universal_ble/universal_ble.dart';
+
+import 'bluetooth.dart';
+import 'module.dart';
 
 /// boilerplate defs *
 
@@ -44,6 +51,119 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+
+
+  Future<bool> isBTPermissionGiven() async {
+    if (Platform.isAndroid) {
+      var isAndroidS = true;
+      if (isAndroidS) {
+        if (await Permission.bluetoothScan.isGranted) {
+          return true;
+        } else {
+          var response = await [
+            Permission.bluetoothScan,
+            Permission.bluetoothConnect
+          ].request();
+          return response[Permission.bluetoothScan]?.isGranted == true &&
+              response[Permission.bluetoothConnect]?.isGranted == true;
+        }
+      }
+    }
+    return false;
+  }
+  void asyncInitState() async {
+
+    await isBTPermissionGiven();
+
+    UniversalBle.onAvailabilityChange = (state) {
+      setState(() async {
+        switch (state) {
+          case AvailabilityState.resetting:
+          case AvailabilityState.unknown:
+          case AvailabilityState.unsupported:
+          case AvailabilityState.unauthorized:
+            isChecking = true;
+          case AvailabilityState.poweredOff:
+            isBluetoothOn = false;
+            isChecking = false;
+            noPerms = false;
+          case AvailabilityState.poweredOn:
+            isBluetoothOn = true;
+            isChecking = false;
+            noPerms = false;
+        }
+        if(lastState != state) print(state);
+        lastState = state;
+      });
+    };
+
+    UniversalBle.onScanResult = (device) {
+      setState(() {
+        bool willAdd = true;
+        List<BleDevice> selectedList = [];
+
+        selectedList = device.name == null ? hiddenDevices : devices;
+
+        if(selectedList.isEmpty) {
+          print("Adding device $device");
+          selectedList.add(device);
+          willAdd = false;
+        }
+
+        else for(BleDevice presentDevice in selectedList){
+          if(presentDevice.deviceId == device.deviceId) {
+            willAdd = false;
+            break;
+          }
+        }
+        if(willAdd) {
+          selectedList.add(device);
+        }
+
+        selectedList.sort((a, b) {
+          var x = b.rssi!.compareTo(a.rssi as num);
+          return x;
+        });
+      });
+    };
+
+
+
+    UniversalBle.onConnectionChange = (callbackDeviceId, didConnect, err) {
+      setState(() async {
+        print("Connection state changed. DeviceId: $callbackDeviceId, Connected: $didConnect, Err: $err");
+
+        connected = didConnect;
+        deviceId = callbackDeviceId;
+
+        for (BleDevice device in devices){
+          if(device.deviceId == deviceId && !connected && connectedDevices.contains(device)){
+            connectedDevices.remove(device);
+            print("Removed device [$device] from connectedDevices");
+          }
+          if(device.deviceId == deviceId && connected && !connectedDevices.contains(device)){
+            connectedDevices.add(device);
+            availableServices = await UniversalBle.discoverServices(deviceId);
+            getConfig();
+            defineService();
+            print("Added device [$device] to connectedDevices");
+          }
+        }
+      });
+
+    };
+  }
+  @override
+  void initState() {
+    activeModules = [];
+    inactiveModules = [];
+    for(MMModule mod in config.modules){
+      mod.isEnabled() && mod.title != "alert"
+          ? activeModules.add(mod)
+          : inactiveModules.add(mod);
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

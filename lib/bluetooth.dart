@@ -5,6 +5,7 @@ import 'package:fothema_companion/main.dart';
 import 'package:universal_ble/universal_ble.dart';
 
 import 'config.dart';
+import 'module.dart';
 
 
 const core_service = "4138";
@@ -17,6 +18,8 @@ const connect = "413E";
 String service = "";
 late MMConfig config;
 List<MMModule> modules = [];
+List<MMModule> activeModules = [];
+List<MMModule> inactiveModules = [];
 List<BleService> availableServices = [];
 String deviceId = "";
 bool connected = false;
@@ -30,8 +33,6 @@ List<BleDevice> devices = [];
 List<BleDevice> hiddenDevices = [];
 AvailabilityState lastState = AvailabilityState.poweredOn;
 
-var activeModules = [];
-var inactiveModules = [];
 
 Future<void> init() async {
   if(availableServices.isEmpty || modules.isEmpty){
@@ -40,8 +41,13 @@ Future<void> init() async {
 
 }
 
-Future<MMConfig> getConfig() async {
+Future<MMConfig> getConfig({bool force = false}) async {
   init();
+
+  if(!force && !config.exists){
+    return config;
+  }
+
   var incoming = await UniversalBle.readValue(deviceId, service, get);
   config = jsonDecode(utf8.decode(incoming as List<int>)) as MMConfig;
   print("Retrieved config: $config");

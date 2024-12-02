@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
 
 import '../config.dart';
+import '../module.dart';
 
 /*
 
@@ -112,13 +113,17 @@ class _ModuleBoxState extends State<ModulesBox>{
               Flex(direction: Axis.vertical, children: [Switch(value: activeModules.contains(module), onChanged: (changed) => toggleModule(module, changed))],),
               ExpansionTile(
                 title: Text(module.displayText.isNotEmpty ? module.displayText : module.title),
+                childrenPadding: EdgeInsets.only(left: 3.0),
                 children: [
-
                   Row(
+                    children: [
+                      TextFormField(
 
+                      )
+                    ],
                   )
                 ],
-                childrenPadding: EdgeInsets.only(left: 3.0),)
+              )
             ],
           )
           
