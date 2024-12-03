@@ -1,5 +1,7 @@
 
 import 'main.dart';
+import 'module.dart';
+
 
 class MMConfig {
 
@@ -47,6 +49,8 @@ class MMConfig {
 
   late List<MMModule> modules = fetchModules();
 
+  final bool exists;
+
   @override
   String toString() {
     // TODO: implement toString
@@ -54,36 +58,10 @@ class MMConfig {
     return "Config{address=$address,port=$port,basePath=$basePath,ipWhitelist=$_0,useHttps=$useHttps,privateKey=$privateKey,certificate=$certificate,language=$language,country=$country,logLevel=$_1,timeFormat=$timeFormat,units=$units";
   }
 
-  MMConfig(this.config);
+  MMConfig({required this.config, this.exists = true});
+  MMConfig empty(){
+    return MMConfig(config: JsonObj(), exists: false);
+  }
 
 }
 
-class MMModule {
-
-  final JsonObj selectedModule;
-
-
-  dynamic moduleDataFetch(String valueFromKey){
-    for(var key in selectedModule.keys){
-      if(key == valueFromKey) return selectedModule[key] ?? "";
-    }
-  }
-
-  late String title = moduleDataFetch("module") ?? "";
-  late String pos = moduleDataFetch("position") ?? "";
-  late String displayText = moduleDataFetch("header") ?? "";
-  late JsonObj moduleConfig = moduleDataFetch("config") ?? "";
-  late String cachedPos = pos.isNotEmpty ? pos : "top-left";
-
-  void disable(){
-    cachedPos = pos.isNotEmpty ? pos : "top-left";
-    pos = "";
-  }
-
-  void enable(){
-    pos = cachedPos;
-  }
-
-  MMModule(this.selectedModule);
-
-}

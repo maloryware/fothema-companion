@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
+import 'package:fothema_companion/module.dart';
+import 'package:fothema_companion/widget/module_container.dart';
 import 'package:fothema_companion/widget/modules_box.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -13,12 +15,10 @@ class ModulesPage extends StatefulWidget {
 
 class _ModulesPageState extends State<ModulesPage> {
 
-
   void asyncInitState() async {
 
     if(modules.isEmpty) {
       getConfig();
-      print("getConfig() called by page_modules.dart");
     }
 
     UniversalBle.onValueChange = (deviceId, characteristicId, value){
@@ -45,23 +45,25 @@ class _ModulesPageState extends State<ModulesPage> {
   @override
   Widget build(BuildContext context) {
 
-    return !connected ? Container(alignment: Alignment.center, child: Text("Not connected.")):
+    // return !connected ? Container(alignment: Alignment.center, child: Text("Not connected.")):
 
-    Builder(
-      builder: (context) => Column(
-        children: [
+    return Column(
 
-          ModulesBox(moduleType: ModuleType.ACTIVE),
-          ModulesBox(moduleType: ModuleType.INACTIVE),
+      children: [
+        ExpansionTile(title: Text("Active"), children: [
+          for(MMModule mod in activeModules) ModuleContainer(mod)
+        ]),
+        ExpansionTile(title: Text("Inactive"), children: [
+          for(MMModule mod in inactiveModules) ModuleContainer(mod)
+        ]),
 
-          ConstrainedBox(constraints: const BoxConstraints(minHeight: 10, maxHeight: 30), child:
-            ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
-          ),
-          ConstrainedBox(constraints: const BoxConstraints(minHeight: 10, maxHeight: 30), child:
-            ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: getConfig, label: Text("getConfig")),
-          ),
-        ],
-      ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
+          ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
+          ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: () => getConfig(force: true), label: Text("Force Update Config")),
+        ),
+      ],
     );
 
 

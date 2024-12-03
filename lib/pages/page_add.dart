@@ -1,12 +1,9 @@
 
 
-import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
 import 'package:universal_ble/universal_ble.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class AddDevicePage extends StatefulWidget {
   @override
@@ -15,121 +12,13 @@ class AddDevicePage extends StatefulWidget {
 
 
 class _AddDevicePageState extends State<AddDevicePage>{
-
-
   bool failState(){
     return noPerms || isChecking || !isBluetoothOn;
   }
 
-  Future<bool> isBTPermissionGiven() async {
-    if (Platform.isAndroid) {
-      var isAndroidS = true;
-      if (isAndroidS) {
-        if (await Permission.bluetoothScan.isGranted) {
-          return true;
-        } else {
-          var response = await [
-            Permission.bluetoothScan,
-            Permission.bluetoothConnect
-          ].request();
-          return response[Permission.bluetoothScan]?.isGranted == true &&
-              response[Permission.bluetoothConnect]?.isGranted == true;
-        }
-      }
-    }
-    return false;
-  }
-
-
-  void asyncInitState() async {
-
-    await isBTPermissionGiven();
-
-    UniversalBle.onAvailabilityChange = (state) {
-      setState(() async {
-        switch (state) {
-          case AvailabilityState.resetting:
-          case AvailabilityState.unknown:
-          case AvailabilityState.unsupported:
-          case AvailabilityState.unauthorized:
-            isChecking = true;
-          case AvailabilityState.poweredOff:
-            isBluetoothOn = false;
-            isChecking = false;
-            noPerms = false;
-          case AvailabilityState.poweredOn:
-            isBluetoothOn = true;
-            isChecking = false;
-            noPerms = false;
-        }
-        if(lastState != state) print(state);
-        lastState = state;
-      });
-    };
-
-    UniversalBle.onScanResult = (device) {
-      setState(() {
-        bool willAdd = true;
-        List<BleDevice> selectedList = [];
-
-        selectedList = device.name == null ? hiddenDevices : devices;
-
-        if(selectedList.isEmpty) {
-          print("Adding device $device");
-          selectedList.add(device);
-          willAdd = false;
-        }
-
-        else for(BleDevice presentDevice in selectedList){
-          if(presentDevice.deviceId == device.deviceId) {
-            willAdd = false;
-            break;
-          }
-        }
-        if(willAdd) {
-          selectedList.add(device);
-        }
-
-        selectedList.sort((a, b) {
-          var x = b.rssi!.compareTo(a.rssi as num);
-          return x;
-        });
-      });
-    };
-
-
-
-    UniversalBle.onConnectionChange = (callbackDeviceId, didConnect, err) {
-      setState(() async {
-        print("Connection state changed. DeviceId: $callbackDeviceId, Connected: $didConnect, Err: $err");
-
-        connected = didConnect;
-        deviceId = callbackDeviceId;
-
-        for (BleDevice device in devices){
-          if(device.deviceId == deviceId && !connected && connectedDevices.contains(device)){
-            connectedDevices.remove(device);
-            print("Removed device [$device] from connectedDevices");
-          }
-          if(device.deviceId == deviceId && connected && !connectedDevices.contains(device)){
-            connectedDevices.add(device);
-            availableServices = await UniversalBle.discoverServices(deviceId);
-            getConfig();
-            print("getConfig() called by page_add.dart");
-            defineService();
-            print("Added device [$device] to connectedDevices");
-          }
-        }
-      });
-
-    };
-  }
-
-
   @override
   void initState() {
     super.initState();
-    asyncInitState();
   }
 
   @override
@@ -158,7 +47,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
                       ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
                       ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                       ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
-                      ElevatedButton(onPressed: () {for(var device in devices) print(device.deviceId); }, child: Text("Get list"), ),
+                      ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                     ],
                   ),
                 )
