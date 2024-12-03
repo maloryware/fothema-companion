@@ -59,74 +59,47 @@ class _AddDevicePageState extends State<AddDevicePage>{
       );
     }
 
-    return Builder(
-      builder: (context) {
-        if(devices.isEmpty && hiddenDevices.isEmpty) return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(child: Center(child: Text("No devices detected."))),
-              ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 5, minHeight: 5),
-                  child: SizedBox(width: 1, height: 1,)
-              ),
-              ConstrainedBox(constraints: const BoxConstraints(minHeight: 10),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
-                        ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
-                        ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
-                        ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
-                      ],
-                    ),
-                  )
-              )
-            ],
-          ),
-        );
-        else return Column(
-              children: [
-                Expanded(
-                  child: ListView(
-                    children: [
-                        for(var device in devices)
-                          DeviceTile(device: device, title: device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId),
-                      if(hiddenDevices.isNotEmpty)
-                        ExpansionTile(
-                          title: Text("Hidden devices"),
-                          children: [
-                            for(var device in hiddenDevices)
-                              DeviceTile(device: device, title: "Hidden devices")
-                          ],
-                        )
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
 
-                    ]
-                  ),
-                ),
-                 ConstrainedBox(
-                     constraints: const BoxConstraints(maxHeight: 5, minHeight: 5),
-                     child: SizedBox(width: 1, height: 1,)
-                 ),
-                 ConstrainedBox(constraints: const BoxConstraints(minHeight: 10),
-                 child: Padding(
-                   padding: const EdgeInsets.only(bottom: 25.0),
-                   child: Row(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                       ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
-                       ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
-                       ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
-                       ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
-                       ElevatedButton(onPressed: connectedDevices.isEmpty ? null : () => UniversalBle.disconnect(connectedDevices.first.deviceId), child: Text("Force Disconnect"), )
-                     ],
-                   ),
-               ))
-              ]
-        );
-      }
+        if(devices.isEmpty) Expanded(child: Center(child: Text("No devices detected.")))
+        else Expanded(
+          child: ListView(
+            children: [
+              for(var device in devices)
+                DeviceTile(device: device, title: device.name != null && device.name.toString().isNotEmpty ? device.name.toString() : device.deviceId),
+                if(hiddenDevices.isNotEmpty)
+                  ExpansionTile(
+                    title: Text("Hidden devices"),
+                    children: [
+                    for(var device in hiddenDevices)
+                      DeviceTile(device: device, title: "Hidden devices")
+              ],
+              )
+
+            ]
+          ),
+        ),
+        ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 5, minHeight: 5),
+            child: SizedBox(width: 1, height: 1,)
+        ),
+        ConstrainedBox(constraints: const BoxConstraints(minHeight: 10),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 25.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
+                  ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
+                  ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
+                  ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
+                ],
+              ),
+            )
+        )
+      ]
     );
   }
 
