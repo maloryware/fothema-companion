@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:fothema_companion/main.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -15,8 +13,14 @@ const send = "413C";
 const backup = "413D";
 const connect = "413E";
 
+String serverSideConfig = "";
+String debugConfigString = "";
+
+MMConfig debugConfig = MMConfig(config: jsonDecode(debugConfigString));
+List<MMModule> debugConfigModules = debugConfig.modules;
+
 String service = "";
-late MMConfig config;
+MMConfig config = MMConfig.empty();
 List<MMModule> modules = [];
 List<MMModule> activeModules = [];
 List<MMModule> inactiveModules = [];
@@ -35,17 +39,19 @@ AvailabilityState lastState = AvailabilityState.poweredOn;
 
 
 Future<void> init() async {
-  if(availableServices.isEmpty || modules.isEmpty){
+  if((availableServices.isEmpty || modules.isEmpty) && !debugMode){
     availableServices = await UniversalBle.discoverServices(deviceId);
   }
 
 }
 
 Future<MMConfig> getConfig({bool force = false}) async {
+  if(debugMode) return debugConfig;
+
   init();
 
-  if(!force && !config.exists){
-    return config;
+  if((!force && config.exists) || debugMode){
+    return debugMode ? debugConfig : config;
   }
 
   var incoming = await UniversalBle.readValue(deviceId, service, get);
@@ -53,11 +59,13 @@ Future<MMConfig> getConfig({bool force = false}) async {
   print("Retrieved config: $config");
   modules = config.modules;
   return config;
+
 }
 
 
 
 void defineService() {
+  if(debugMode) return;
   init();
   bool _success = false;
   for(var serv in availableServices){
@@ -71,9 +79,11 @@ void defineService() {
   if(!_success) print("Unable to locate proper service. Is your mirror running the FOTHEMA Server?");
 }
 
-void updateConfig(Map<String, dynamic> config){
+void updateConfig(MMConfig config){
   init();
-  UniversalBle.writeValue(deviceId, service, send, utf8.encode(jsonEncode(config)), BleOutputProperty.withResponse);
+  debugMode
+      ? serverSideConfig = debugConfig.serialize()
+      : UniversalBle.writeValue(deviceId, service, send, config.serialize(encoded: true), BleOutputProperty.withResponse);
 }
 
 void backupConfig(){

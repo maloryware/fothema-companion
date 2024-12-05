@@ -33,7 +33,7 @@ class Pages {
 }
 //* defines the home page (index)
 const int homePage = 2;
-
+bool debugMode = false;
 /// end boilerplate defs *
 
 void main() {
@@ -155,6 +155,7 @@ class HomeState extends State<Home> {
   }
   @override
   void initState() {
+    if(!config.exists) getConfig();
     activeModules = [];
     inactiveModules = [];
     for(MMModule mod in config.modules){
@@ -163,6 +164,7 @@ class HomeState extends State<Home> {
           : inactiveModules.add(mod);
     }
     super.initState();
+    asyncInitState();
   }
 
   @override
