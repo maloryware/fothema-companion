@@ -50,10 +50,10 @@ class _ModulesPageState extends State<ModulesPage> {
     return Column(
 
       children: [
-        ExpansionTile(title: Text("Active"), children: [
+        ExpansionTile(initiallyExpanded: false, title: Text("Active"), children: [
           for(MMModule mod in activeModules) ModuleContainer(mod)
         ]),
-        ExpansionTile(title: Text("Inactive"), children: [
+        ExpansionTile(initiallyExpanded: false, title: Text("Inactive"), children: [
           for(MMModule mod in inactiveModules) ModuleContainer(mod)
         ]),
 
