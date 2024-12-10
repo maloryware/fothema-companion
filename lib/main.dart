@@ -6,7 +6,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fothema_companion/pages/page_add.dart';
-import 'package:fothema_companion/pages/page_gestures.dart';
+import 'package:fothema_companion/pages/page_shop.dart';
 import 'package:fothema_companion/pages/page_mirror.dart';
 import 'package:fothema_companion/pages/page_modules.dart';
 import 'package:fothema_companion/pages/page_settings.dart';
@@ -19,20 +19,30 @@ import 'module.dart';
 //* boilerplate defs *
 
 typedef JsonObj = Map<String, dynamic>;
+
 class Page {
   final IconData icon;
   final Widget widget;
   Page(this.icon, this.widget);
 }
+
 class Pages {
-  var gestures = Page(Icons.waving_hand, GesturesPage());
+  var shop = Page(Icons.shop, ShopPage());
   var modules = Page(Icons.account_tree_sharp, ModulesPage());
   var add  = Page(Icons.add, AddDevicePage());
   var mirror = Page(Icons.rectangle_outlined, MirrorPage());
   var settings = Page(Icons.settings, SettingsPage());
 }
-//* defines the home page (index) *
+//* defines the home page (index)
 const int homePage = 2;
+
+
+/// end boilerplate defs *
+
+void main() {
+  runApp(Home());
+  //SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+}
 
 
 Future<bool> isBTPermissionGiven() async {
@@ -55,13 +65,6 @@ Future<bool> isBTPermissionGiven() async {
 }
 
 //* end boilerplate defs *
-
-
-void main() {
-  runApp(Home());
-  //SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-}
-
 
 
 class Home extends StatefulWidget {
@@ -186,7 +189,7 @@ class HomeState extends State<Home> {
                 Expanded(
                     child: TabBarView(
                         children: [
-                          Pages().gestures.widget,
+                          Pages().shop.widget,
                           Pages().modules.widget,
                           Pages().add.widget,
                           Pages().mirror.widget,
@@ -198,12 +201,12 @@ class HomeState extends State<Home> {
             ),
             bottomNavigationBar: ConvexAppBar.badge(
               //* optional badge args for each of the badges
-              //* takes Strgestures, Icogesturesta, Color, and Widget
+              //* takes Strings, Icons, Color, and Widget
                 const<int, dynamic>{},
                 style: TabStyle.reactCircle,
                 backgroundColor: Color(0xffa1337f),
                 items: <TabItem>[
-                  TabItem(icon: Pages().gestures.icon),
+                  TabItem(icon: Pages().shop.icon),
                   TabItem(icon: Pages().modules.icon),
                   TabItem(icon: Pages().add.icon),
                   TabItem(icon: Pages().mirror.icon),

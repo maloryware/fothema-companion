@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class GesturesPage extends StatefulWidget {
+class ShopPage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _GesturesPageState();
+  State<StatefulWidget> createState() => _ShopPageState();
 }
 
-class _GesturesPageState extends State<GesturesPage> {
+class _ShopPageState extends State<ShopPage> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
