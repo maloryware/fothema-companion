@@ -63,7 +63,9 @@ class _GetModulesPageState extends State<ModulesPage> {
           ElevatedButton(onPressed: () => print(availableServices), child: Text("Fetch services")),
         ),
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
-          ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: () => getConfig(force: true), label: Text("Force Update Config")),
+          ElevatedButton.icon(icon: Icon(Icons.bug_report),onPressed: () => setState(() {
+            getConfig(force: true);
+          }), label: Text("Force Update Config")),
         ),
       ],
     );

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fothema_companion/fothema_config.dart';
 import 'package:fothema_companion/pages/page_add.dart';
 import 'package:fothema_companion/pages/page_shop.dart';
 import 'package:fothema_companion/pages/page_mirror.dart';
@@ -79,6 +80,9 @@ class HomeState extends State<Home> {
 
 
   void asyncInitState() async {
+
+
+    updateModules();
 
     await isBTPermissionGiven();
 
@@ -162,14 +166,7 @@ class HomeState extends State<Home> {
   }
   @override
   void initState() {
-    if(!config.exists) getConfig();
-    activeModules = [];
-    inactiveModules = [];
-    for(MMModule mod in config.modules){
-      mod.isEnabled() && mod.title != "alert"
-          ? activeModules.add(mod)
-          : inactiveModules.add(mod);
-    }
+
 
     super.initState();
     asyncInitState();

@@ -52,20 +52,25 @@ Future<void> init() async {
 }
 
 Future<MMConfig> getConfig({bool force = false}) async {
-  if(debugMode) return debugConfig;
-
+  //if(debugMode) return debugConfig;
   init();
 
-  if((!force && config.exists) || debugMode){
+  if(!force && config.exists){
     return debugMode ? debugConfig : config;
   }
 
-  var incoming = await fetchall();
-  config = jsonDecode(utf8.decode(incoming as List<int>)) as MMConfig;
+  if(debugMode) {
+    config = debugConfig;
+  }
+
+  else {
+    var incoming = await fetchall();
+    config = jsonDecode(utf8.decode(incoming as List<int>)) as MMConfig;
+  }
+
   print("Retrieved config: $config");
   modules = config.modules;
   return config;
-
 }
 
 
@@ -88,6 +93,16 @@ void defineService() {
   }
 }
 
+Future<void> updateModules() async {
+  if(!config.exists) config = await getConfig();
+  activeModules = [];
+  inactiveModules = [];
+  for(MMModule mod in config.modules){
+    mod.isEnabled() && mod.title != "alert"
+        ? activeModules.add(mod)
+        : inactiveModules.add(mod);
+  }
+}
 void updateConfig(MMConfig config){
   init();
   debugMode

@@ -14,8 +14,22 @@ enum _ListType {
 class MMConfig {
 
   dynamic configFetch(String valueFromKey, {listType=_ListType.NONE}){
+    if(!exists){
+      print("Config does not exist.");
+      return;
+    }
     for(var key in config.keys){
-      if(key == valueFromKey) return config[key] ?? "";
+      if(key == valueFromKey) {
+
+        if(listType != _ListType.NONE) switch(listType){
+          case _ListType.MODULE:
+
+            return List<MMModule>.from(config[key].map((e) => e as JsonObj).toList());
+          case _ListType.STRING:
+            return List<String>.from(config[key]);
+        }
+        return config[key] ?? "";
+      }
     }
     print("Warning: no value $valueFromKey found. Passing empty value.");
 
@@ -55,8 +69,8 @@ class MMConfig {
   late String basePath = configFetch("basePath");
   late List<String> ipWhitelist = configFetch("ipWhitelist", listType: _ListType.STRING) as List<String>;
   late bool useHttps = configFetch("useHttps") as bool;
-  late String privateKey = configFetch("");
-  late String certificate = configFetch("httpsCertificate", listType: _ListType.STRING);
+  late String privateKey = configFetch("httpsPrivateKey");
+  late String certificate = configFetch("httpsCertificate");
   late String language = configFetch("language");
   late String country = configFetch("locale");
   late List<String> logLevel = configFetch("logLevel", listType: _ListType.STRING) as List<String>;

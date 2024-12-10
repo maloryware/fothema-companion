@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fothema_companion/bluetooth.dart';
 import 'package:fothema_companion/main.dart';
 import 'package:fothema_companion/settings_routes/route_debug.dart';
 import 'package:fothema_companion/widget/option_tile.dart';
@@ -28,6 +29,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 debugMode = b;
                 String s = b ? "enabled" : "disabled";
                 print("Debug mode $s.");
+                getConfig();
+                updateModules();
               }),
             )),
         if(debugMode) OptionTile(
