@@ -94,7 +94,8 @@ class _ModuleBoxState extends State<ModulesBox>{
   void initState() {
 
     super.initState();
-    for(MMModule mod in modules) {
+    //for(var mod in modules) {
+    for(var mod in modules){
       if(mod.title == "alert") continue;
       mod.pos.isEmpty ? activeModules.add(mod) : inactiveModules.add(mod);
     }
@@ -126,7 +127,7 @@ class _ModuleBoxState extends State<ModulesBox>{
               )
             ],
           )
-          
+
         ]
       );
 

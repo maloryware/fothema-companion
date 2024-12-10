@@ -9,17 +9,18 @@ import '../fothema_config.dart';
 
 class ModulesPage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _ModulesPageState();
+  State<StatefulWidget> createState() => _GetModulesPageState();
 
 }
 
-class _ModulesPageState extends State<ModulesPage> {
+class _GetModulesPageState extends State<ModulesPage> {
 
   void asyncInitState() async {
-
+    /*
     if(modules.isEmpty) {
       getConfig();
     }
+     */
 
     UniversalBle.onValueChange = (deviceId, characteristicId, value){
       print("Characteristic value changed:\n$deviceId,\n$characteristicId,\n$value");
