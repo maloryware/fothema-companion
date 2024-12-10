@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:fothema_companion/widget/config_tile.dart';
 import '../widget/modules_box.dart';
 
 import '../module.dart';
@@ -25,7 +26,7 @@ class _ModuleContainerState extends State<ModuleContainer> {
   }
 
   void updatePos(ModulePos newPos){
-    module.pos = newPos.pos;
+    module.pos = newPos;
   }
 
   void updateModuleConfig(String key, String newValue){
@@ -43,43 +44,52 @@ class _ModuleContainerState extends State<ModuleContainer> {
   }
 
   void asyncInitState() async {
-    throw UnimplementedError();
+    //throw UnimplementedError();
   }
 
 
   @override
   Widget build(BuildContext context) {
     return
-      ExpansionTile(title: Text(module.title), children: [
-        // Display text
-        Row(children: [
-          Text("Display text: "),
-          TextFormField(
-            initialValue: displayTextHandler.text,
-            onChanged: (String value) => updateDisplayText,
+      Expanded(
+        child: ExpansionTile(title: Text(module.title), children: [
+          // Display text
+          Container(
+            padding: EdgeInsets.only(left: 1.0),
+            child: Row(children: [
+              Text("Display text: "),
+              TextFormField(
+                initialValue: displayTextHandler.text,
+                onChanged: (String value) => updateDisplayText,
+              )
+            ]),
+          ),
+          // Position
+          Container(
+            padding: EdgeInsets.only(left: 1.0),
+            child: Row(children: [
+              Text("Position: "),
+              DropdownMenu<ModulePos>(
+                initialSelection: module.pos,
+                dropdownMenuEntries: ModulePos.entries(),
+                onSelected: (newPos) => updatePos,
+              )
+            ]),
+          ),
+          // Module configuration
+          Container(
+            padding: EdgeInsets.only(left: 1.0),
+            child: ExpansionTile(
+              title: Text("Configuration"),
+              children: [
+                ConfigTile(item: module.moduleConfig)
+              ],
+
+            ),
           )
-        ]),
-        // Position
-        Row(children: [
-          Text("Position: "),
-          DropdownMenu<ModulePos>(
-            initialSelection: ModulePos.from(module.pos),
-            dropdownMenuEntries: ModulePos.entries(),
-            onSelected: (newPos) => updatePos,
-          )
-        ]),
-        // Module configuration
-        ExpansionTile(title: Text("Configuration"), children: [
-         for(var k in module.moduleConfig.keys)
-           Row(
-             children: [
-               Text("$k: "),
-               TextFormField(initialValue: module.moduleConfig[k], onChanged: (v) => updateModuleConfig(k, v))
-             ],
-           )
-        ])
-      ],
-    );
+        ],
+            ),
+      );
 
   }
 

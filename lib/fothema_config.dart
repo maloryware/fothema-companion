@@ -22,12 +22,15 @@ class MMConfig {
       if(key == valueFromKey) {
 
         if(listType != _ListType.NONE) switch(listType){
-          case _ListType.MODULE:
 
-            return List<MMModule>.from(config[key].map((e) => e as JsonObj).toList());
+          case _ListType.MODULE:
+            return List<MMModule>.from(config[key].map((e) => MMModule(e)).toList());
+
           case _ListType.STRING:
             return List<String>.from(config[key]);
+
         }
+
         return config[key] ?? "";
       }
     }

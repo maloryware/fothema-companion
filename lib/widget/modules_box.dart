@@ -97,7 +97,7 @@ class _ModuleBoxState extends State<ModulesBox>{
     //for(var mod in modules) {
     for(var mod in modules){
       if(mod.title == "alert") continue;
-      mod.pos.isEmpty ? activeModules.add(mod) : inactiveModules.add(mod);
+      mod.pos.isEmpty() ? activeModules.add(mod) : inactiveModules.add(mod);
     }
   }
 

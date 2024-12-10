@@ -21,12 +21,16 @@ enum ModulePos {
 
   BOTTOM_LEFT("bottom_left", "Bottom Left"),
   BOTTOM_CENTER("bottom_center", "Bottom Center"),
-  BOTTOM_RIGHT("bottom_right", "Bottom Right");
+  BOTTOM_RIGHT("bottom_right", "Bottom Right"),
+  NONE("null", "null");
 
   final String pos;
   final String title;
   const ModulePos(this.pos, this.title);
 
+  bool isEmpty(){
+    return this == ModulePos.NONE;
+  }
   static ModulePos from(String from){
     for (var selection in ModulePos.values){
       if(from == selection.pos) return selection;
@@ -34,10 +38,15 @@ enum ModulePos {
     throw Exception("No position $from found.");
   }
 
+  @override
+  String toString(){
+    return pos;
+  }
+
   static List<DropdownMenuEntry<ModulePos>> entries() {
     List<DropdownMenuEntry<ModulePos>> list = [];
     for (var mod in ModulePos.values){
-      list.add(DropdownMenuEntry(value: mod, label: mod.pos));
+      list.add(DropdownMenuEntry(value: mod, label: mod.title));
     }
     return list;
   }
@@ -45,33 +54,47 @@ enum ModulePos {
 }
 class MMModule {
 
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "MMModule$selectedModule";
+  }
   final JsonObj selectedModule;
 
 
   dynamic moduleDataFetch(String valueFromKey){
     for(var key in selectedModule.keys){
-      if(key == valueFromKey) return selectedModule[key] ?? "";
+      if(key == valueFromKey)
+        return valueFromKey == "position" ? ModulePos.from(selectedModule[key]) : selectedModule[key];
     }
   }
 
   late String title = moduleDataFetch("module") ?? "";
-  late String pos = moduleDataFetch("position") ?? "";
+  late ModulePos pos = moduleDataFetch("position") ?? ModulePos.NONE;
   late String displayText = moduleDataFetch("header") ?? "";
-  late JsonObj moduleConfig = moduleDataFetch("config") ?? "";
-  late String cachedPos = pos.isNotEmpty ? pos : "top-left";
+  late JsonObj moduleConfig = moduleDataFetch("config") ?? <String, dynamic>{};
+  late ModulePos cachedPos = pos != ModulePos.NONE ? pos : ModulePos.TOP_LEFT;
 
   bool isEnabled(){
-    return title != "alert" && pos.isEmpty;
+    return title != "alert" && pos == ModulePos.NONE;
   }
   void disable(){
-    cachedPos = pos.isNotEmpty ? pos : "top-left";
-    pos = "";
+    cachedPos = pos != ModulePos.NONE ? pos : ModulePos.TOP_LEFT;
+    pos = ModulePos.NONE;
   }
 
   void enable(){
     pos = cachedPos;
   }
 
+  static JsonObj serialize({required MMModule module}){
+    return <String, dynamic>{
+      "title": module.title,
+      "pos": module.pos.toString(),
+      "header": module.displayText,
+      "config": module.moduleConfig
+    };
+  }
   MMModule(this.selectedModule);
 
 }
