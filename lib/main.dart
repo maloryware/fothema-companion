@@ -16,7 +16,7 @@ import 'package:universal_ble/universal_ble.dart';
 import 'bluetooth.dart';
 import 'module.dart';
 
-/// boilerplate defs *
+//* boilerplate defs *
 
 typedef JsonObj = Map<String, dynamic>;
 class Page {
@@ -31,14 +31,35 @@ class Pages {
   var mirror = Page(Icons.rectangle_outlined, MirrorPage());
   var settings = Page(Icons.settings, SettingsPage());
 }
-//* defines the home page (index)
+//* defines the home page (index) *
 const int homePage = 2;
-bool debugMode = false;
-/// end boilerplate defs *
+
+
+Future<bool> isBTPermissionGiven() async {
+  if (Platform.isAndroid) {
+    var isAndroidS = true;
+    if (isAndroidS) {
+      if (await Permission.bluetoothScan.isGranted) {
+        return true;
+      } else {
+        var response = await [
+          Permission.bluetoothScan,
+          Permission.bluetoothConnect
+        ].request();
+        return response[Permission.bluetoothScan]?.isGranted == true &&
+            response[Permission.bluetoothConnect]?.isGranted == true;
+      }
+    }
+  }
+  return false;
+}
+
+//* end boilerplate defs *
+
 
 void main() {
   runApp(Home());
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+  //SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
 }
 
 
@@ -53,24 +74,7 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
 
 
-  Future<bool> isBTPermissionGiven() async {
-    if (Platform.isAndroid) {
-      var isAndroidS = true;
-      if (isAndroidS) {
-        if (await Permission.bluetoothScan.isGranted) {
-          return true;
-        } else {
-          var response = await [
-            Permission.bluetoothScan,
-            Permission.bluetoothConnect
-          ].request();
-          return response[Permission.bluetoothScan]?.isGranted == true &&
-              response[Permission.bluetoothConnect]?.isGranted == true;
-        }
-      }
-    }
-    return false;
-  }
+
   void asyncInitState() async {
 
     await isBTPermissionGiven();
@@ -163,6 +167,7 @@ class HomeState extends State<Home> {
           ? activeModules.add(mod)
           : inactiveModules.add(mod);
     }
+
     super.initState();
     asyncInitState();
   }

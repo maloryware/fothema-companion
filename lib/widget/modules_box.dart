@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fothema_companion/bluetooth.dart';
 
-import '../config.dart';
+import '../fothema_config.dart';
 import '../module.dart';
 
 /*

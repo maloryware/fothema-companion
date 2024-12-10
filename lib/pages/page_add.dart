@@ -6,11 +6,13 @@ import 'package:fothema_companion/bluetooth.dart';
 import 'package:fothema_companion/main.dart';
 import 'package:universal_ble/universal_ble.dart';
 
+import '../configuration.dart';
 import '../widget/device_tile.dart';
 
 class AddDevicePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _AddDevicePageState();
+
 }
 
 
@@ -19,8 +21,87 @@ class _AddDevicePageState extends State<AddDevicePage>{
     return noPerms || isChecking || !isBluetoothOn;
   }
 
+  void asyncInitState() async {
+
+    await isBTPermissionGiven();
+    UniversalBle.onAvailabilityChange = (state) {
+      setState(() async {
+        switch (state) {
+          case AvailabilityState.resetting:
+          case AvailabilityState.unknown:
+          case AvailabilityState.unsupported:
+          case AvailabilityState.unauthorized:
+            isChecking = true;
+          case AvailabilityState.poweredOff:
+            isBluetoothOn = false;
+            isChecking = false;
+            noPerms = false;
+          case AvailabilityState.poweredOn:
+            isBluetoothOn = true;
+            isChecking = false;
+            noPerms = false;
+        }
+        if(lastState != state) print(state);
+        lastState = state;
+      });
+    };
+    UniversalBle.onScanResult = (device) {
+      setState(() {
+        bool willAdd = true;
+        List<BleDevice> selectedList = [];
+
+        selectedList = device.name == null ? hiddenDevices : devices;
+
+        if(selectedList.isEmpty) {
+          print("Adding device $device");
+          selectedList.add(device);
+          willAdd = false;
+        }
+
+        else for(BleDevice presentDevice in selectedList){
+          if(presentDevice.deviceId == device.deviceId) {
+            willAdd = false;
+            break;
+          }
+        }
+        if(willAdd) {
+          selectedList.add(device);
+        }
+
+        selectedList.sort((a, b) {
+          var x = b.rssi!.compareTo(a.rssi as num);
+          return x;
+        });
+      });
+    };
+    UniversalBle.onConnectionChange = (callbackDeviceId, didConnect, err) {
+      setState(() async {
+        print("Connection state changed. DeviceId: $callbackDeviceId, Connected: $didConnect, Err: $err");
+
+        connected = didConnect;
+        deviceId = callbackDeviceId;
+
+        for (BleDevice device in devices){
+          if(device.deviceId == deviceId && !connected && connectedDevices.contains(device)){
+            connectedDevices.remove(device);
+            print("Removed device [$device] from connectedDevices");
+          }
+          if(device.deviceId == deviceId && connected && !connectedDevices.contains(device)){
+            connectedDevices.add(device);
+            availableServices = await UniversalBle.discoverServices(deviceId);
+            getConfig();
+            defineService();
+            print("Added device [$device] to connectedDevices");
+          }
+        }
+      });
+
+    };
+  }
+
   @override
   void initState() {
+    asyncInitState();
     super.initState();
   }
 
@@ -39,6 +120,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(height: 30),
           if(failState()) Expanded(child: Center(child: Text(failStateText)))
           else if(devices.isEmpty) Expanded(child: Center(child: Text("No devices detected.")))
 
@@ -52,7 +134,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
                       title: Text("Hidden devices"),
                       children: [
                         for(var device in hiddenDevices)
-                          DeviceTile(device: device, title: "Hidden devices")
+                          DeviceTile(device: device, title: device.deviceId)
                       ],
                     )
 
@@ -73,7 +155,7 @@ class _AddDevicePageState extends State<AddDevicePage>{
                     ElevatedButton(onPressed: UniversalBle.startScan, child: Text("Scan"), ),
                     ElevatedButton(onPressed: UniversalBle.stopScan, child: Text("Stop"), ),
                     ElevatedButton(onPressed: () => setState(devices.clear), child: Text("Clear"), ),
-                    ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
+                    if(debugMode) ElevatedButton(onPressed: () => print(devices), child: Text("Get list"), ),
                   ],
                 ),
               )

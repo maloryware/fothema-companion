@@ -5,7 +5,7 @@ import 'package:fothema_companion/widget/module_container.dart';
 import 'package:fothema_companion/widget/modules_box.dart';
 import 'package:universal_ble/universal_ble.dart';
 
-import '../config.dart';
+import '../fothema_config.dart';
 
 class ModulesPage extends StatefulWidget {
   @override
@@ -50,6 +50,7 @@ class _ModulesPageState extends State<ModulesPage> {
     return Column(
 
       children: [
+        SizedBox(height: 30),
         ExpansionTile(initiallyExpanded: false, title: Text("Active"), children: [
           for(MMModule mod in activeModules) ModuleContainer(mod)
         ]),
