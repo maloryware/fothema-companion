@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:fothema_companion/main.dart';
 import 'package:universal_ble/universal_ble.dart';
 
-import 'config.dart';
+import 'configuration.dart';
+import 'fothema_config.dart';
 import 'module.dart';
 
 
@@ -76,7 +77,10 @@ void defineService() {
     }
   }
   getConfig();
-  if(!_success) print("Unable to locate proper service. Is your mirror running the FOTHEMA Server?");
+  if(!_success) {
+    print("Unable to locate proper service. Is your mirror running the FOTHEMA Server?");
+    throw ConnectionException("No correspondent services found.");
+  }
 }
 
 void updateConfig(MMConfig config){

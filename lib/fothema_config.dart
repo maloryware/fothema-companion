@@ -27,6 +27,27 @@ class MMConfig {
     }
   }
 
+  @override
+  String toString({includeModules = false}) {
+    return
+      includeModules
+          ? "Config{address=$address,port=$port,basePath=$basePath,ipWhitelist=$ipWhitelist,useHttps=$useHttps,privateKey=$privateKey,certificate=$certificate,language=$language,country=$country,logLevel=$logLevel,timeFormat=$timeFormat,units=$units}"
+          : "Config{address=$address,port=$port,basePath=$basePath,ipWhitelist=$ipWhitelist,useHttps=$useHttps,privateKey=$privateKey,certificate=$certificate,language=$language,country=$country,logLevel=$logLevel,timeFormat=$timeFormat,units=$units,modules=$modules";
+
+  }
+
+  MMConfig({required this.config, this.exists = true});
+  static MMConfig empty(){
+    return MMConfig(config: JsonObj(), exists: false);
+  }
+
+  dynamic serialize({encoded = false}){
+    return
+      !encoded
+          ? utf8.encode(jsonEncode(config))
+          : jsonEncode(config);
+  }
+
   final JsonObj config;
   
   late String address = configFetch("address");
@@ -45,27 +66,6 @@ class MMConfig {
   late List<MMModule> modules = configFetch("modules", listType: _ListType.MODULE) as List<MMModule>;
 
   final bool exists;
-
-  @override
-  String toString({includeModules = false}) {
-    return
-      includeModules
-          ? "Config{address=$address,port=$port,basePath=$basePath,ipWhitelist=$ipWhitelist,useHttps=$useHttps,privateKey=$privateKey,certificate=$certificate,language=$language,country=$country,logLevel=$logLevel,timeFormat=$timeFormat,units=$units}"
-          : "Config{address=$address,port=$port,basePath=$basePath,ipWhitelist=$ipWhitelist,useHttps=$useHttps,privateKey=$privateKey,certificate=$certificate,language=$language,country=$country,logLevel=$logLevel,timeFormat=$timeFormat,units=$units,modules=$modules";
-
-    }
-
-  MMConfig({required this.config, this.exists = true});
-  static MMConfig empty(){
-    return MMConfig(config: JsonObj(), exists: false);
-  }
-
-  dynamic serialize({encoded = false}){
-    return
-      !encoded
-          ? utf8.encode(jsonEncode(config))
-          : jsonEncode(config);
-  }
 
 }
 

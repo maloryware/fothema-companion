@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:universal_ble/universal_ble.dart';
 
 import '../bluetooth.dart';
+import '../configuration.dart';
+import '../main.dart';
 
 class DeviceTile extends StatefulWidget{
 
@@ -17,7 +19,7 @@ class DeviceTile extends StatefulWidget{
 
 class DeviceTileState extends State<DeviceTile>{
 
-  var device;
+  late BleDevice device;
 
   @override
   void initState() {
@@ -53,7 +55,7 @@ class DeviceTileState extends State<DeviceTile>{
                   icon: Icon(Icons.connect_without_contact),
                   label: Text("Pair")
               ),
-              ElevatedButton.icon(
+              if(debugMode) ElevatedButton.icon(
                   onPressed: () => print(device.toString()),
                   icon: Icon(Icons.bug_report),
                   label: Text("Print device info")
