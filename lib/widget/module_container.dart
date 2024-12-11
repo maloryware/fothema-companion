@@ -51,45 +51,46 @@ class _ModuleContainerState extends State<ModuleContainer> {
   @override
   Widget build(BuildContext context) {
     return
-      Expanded(
-        child: ExpansionTile(title: Text(module.title), children: [
-          // Display text
-          Container(
-            padding: EdgeInsets.only(left: 1.0),
-            child: Row(children: [
-              Text("Display text: "),
-              TextFormField(
-                initialValue: displayTextHandler.text,
-                onChanged: (String value) => updateDisplayText,
-              )
-            ]),
-          ),
-          // Position
-          Container(
-            padding: EdgeInsets.only(left: 1.0),
-            child: Row(children: [
-              Text("Position: "),
-              DropdownMenu<ModulePos>(
-                initialSelection: module.pos,
-                dropdownMenuEntries: ModulePos.entries(),
-                onSelected: (newPos) => updatePos,
-              )
-            ]),
-          ),
-          // Module configuration
-          Container(
-            padding: EdgeInsets.only(left: 1.0),
-            child: ExpansionTile(
-              title: Text("Configuration"),
-              children: [
-                ConfigTile(item: module.moduleConfig)
-              ],
+      ExpansionTile(title: Text(module.title), children: [
+        // Display text
+        Container(
 
-            ),
-          )
-        ],
-            ),
-      );
+          padding: EdgeInsets.only(left: 1.0),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text("Display text: "),
+            TextFormField(
+              initialValue: displayTextHandler.text,
+              onChanged: (String value) => updateDisplayText,
+            )
+          ]),
+        ),
+        // Position
+        SizedBox(
+          height: 100,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text("Position: "),
+            DropdownMenu<ModulePos>(
+              initialSelection: module.pos,
+              dropdownMenuEntries: ModulePos.entries(),
+              onSelected: (newPos) => updatePos,
+            )
+          ]),
+        ),
+        // Module configuration
+        SizedBox(
+
+          height: 400,
+          child: ExpansionTile(
+
+            title: Text("Configuration"),
+            children: [
+              ConfigTile(item: module.moduleConfig)
+            ],
+
+          ),
+        )
+      ],
+          );
 
   }
 

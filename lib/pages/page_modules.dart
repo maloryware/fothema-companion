@@ -53,10 +53,16 @@ class _GetModulesPageState extends State<ModulesPage> {
       children: [
         SizedBox(height: 30),
         ExpansionTile(initiallyExpanded: false, title: Text("Active"), children: [
-          for(MMModule mod in activeModules) ModuleContainer(mod)
+          Expanded(child: Column(
+            children: [for(MMModule mod in activeModules) ModuleContainer(mod)],
+          ))
+
         ]),
         ExpansionTile(initiallyExpanded: false, title: Text("Inactive"), children: [
-          for(MMModule mod in inactiveModules) ModuleContainer(mod)
+          Expanded(child: Column(
+            children: [for(MMModule mod in inactiveModules) ModuleContainer(mod)],
+          ))
+
         ]),
 
         ConstrainedBox(constraints: const BoxConstraints(minHeight: 10), child:
