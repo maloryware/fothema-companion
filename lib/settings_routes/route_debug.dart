@@ -15,13 +15,12 @@ class DebugOptions extends MaterialPageRoute<void> {
               OptionTile(
                   title: "Force enable Bluetooth functionality",
                   child: Switch(
-                      value: forceBluetoothFunctionality,
+                      value: forceBluetoothFunctionality(),
                       onChanged: (b) => setState(() {
-                        forceBluetoothFunctionality = b;
+                        updateSetting(setting: Settings.DEBUG_FORCE_BLUETOOTH_FUNCTIONALITY, value: b);
                       })
                   )
               )
-
             ]
           )
         )

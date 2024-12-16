@@ -23,21 +23,22 @@ class OptionTile extends StatelessWidget {
         ? InkWell(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.only(top: 2.0, bottom: 2.0),
+          padding: EdgeInsets.all(10.0),
           child: Row(children: [
             SizedBox(width: 10),
             Text(title),
             Expanded(child: SizedBox()),
-            SizedBox(width: 10)
           ]),
         ))
-        : Row(children: [
+        : Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Row(children: [
             SizedBox(width: 10),
             Text(title),
             Expanded(child: SizedBox()),
-            child as Widget,
-            SizedBox(width: 10)
-        ]);
+            child as Widget
+          ]),
+        );
   }
 
 }

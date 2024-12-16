@@ -46,12 +46,14 @@ enum ModulePos {
   static List<DropdownMenuEntry<ModulePos>> entries() {
     List<DropdownMenuEntry<ModulePos>> list = [];
     for (var mod in ModulePos.values){
+      if(mod != ModulePos.NONE)
       list.add(DropdownMenuEntry(value: mod, label: mod.title));
     }
     return list;
   }
 
 }
+
 class MMModule {
 
   @override
@@ -68,24 +70,25 @@ class MMModule {
         return valueFromKey == "position" ? ModulePos.from(selectedModule[key]) : selectedModule[key];
     }
   }
-
+  late int index;
   late String title = moduleDataFetch("module") ?? "";
   late ModulePos pos = moduleDataFetch("position") ?? ModulePos.NONE;
   late String displayText = moduleDataFetch("header") ?? "";
   late JsonObj moduleConfig = moduleDataFetch("config") ?? <String, dynamic>{};
-  late ModulePos cachedPos = pos != ModulePos.NONE ? pos : ModulePos.TOP_LEFT;
+  late ModulePos cachedPos = ModulePos.NONE;
 
   bool isEnabled(){
-    return title != "alert" && pos == ModulePos.NONE;
+    return title == "alert" || (title != "alert" && pos != ModulePos.NONE);
   }
   void disable(){
-    cachedPos = pos != ModulePos.NONE ? pos : ModulePos.TOP_LEFT;
+    cachedPos = pos;
     pos = ModulePos.NONE;
   }
 
   void enable(){
     pos = cachedPos;
   }
+
 
   static JsonObj serialize({required MMModule module}){
     return <String, dynamic>{
@@ -95,6 +98,6 @@ class MMModule {
       "config": module.moduleConfig
     };
   }
-  MMModule(this.selectedModule);
+  MMModule(this.selectedModule, {required this.index});
 
 }

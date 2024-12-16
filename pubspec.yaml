@@ -17,7 +17,15 @@ dependencies:
   english_words: ^4.0.0
   provider: ^6.0.0
   permission_handler: ^11.3.1
-  universal_ble: 0.13.0
+  universal_ble: ^0.13.0
+  path_provider: ^2.1.5
+  webview_flutter: ^4.10.0
+  toastification: ^2.3.0
+
+fonts:
+- family: RobotoMono
+  fonts:
+  - asset: fonts/roboto_mono.ttf
 
 dev_dependencies:
   flutter_test:

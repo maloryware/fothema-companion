@@ -1,4 +1,4 @@
-
+import 'dart:typed_data';
 import 'dart:convert';
 import 'main.dart';
 import 'module.dart';
@@ -21,20 +21,23 @@ class MMConfig {
     for(var key in config.keys){
       if(key == valueFromKey) {
 
-        if(listType != _ListType.NONE) switch(listType){
-
-          case _ListType.MODULE:
-            return List<MMModule>.from(config[key].map((e) => MMModule(e)).toList());
-
-          case _ListType.STRING:
-            return List<String>.from(config[key]);
-
+        if(listType != _ListType.NONE) {
+          switch (listType) {
+            case _ListType.MODULE:
+              List<MMModule> list = [];
+              int _i = 0;
+              for(var x in config[key]) {
+                list.add(MMModule(x, index: _i));
+                _i++;
+              }
+              return list;
+            case _ListType.STRING:
+              return List<String>.from(config[key]);
+            }
+          }
+          return config[key] ?? "";
         }
-
-        return config[key] ?? "";
       }
-    }
-    print("Warning: no value $valueFromKey found. Passing empty value.");
 
     switch(listType){
       case _ListType.STRING:
@@ -54,17 +57,27 @@ class MMConfig {
   }
 
   MMConfig({required this.config, this.exists = true});
+
   static MMConfig empty(){
     return MMConfig(config: JsonObj(), exists: false);
   }
 
-  dynamic serialize({encoded = false}){
-    return
-      !encoded
-          ? utf8.encode(jsonEncode(config))
-          : jsonEncode(config);
+  String serialize(){
+    return jsonEncode(config);
   }
 
+  Uint8List encode(){
+    return utf8.encode(jsonEncode(config));
+  }
+
+  void modify({required int index, required dynamic newModule}){
+    for(MMModule mod in modules){
+      if(index == mod.index){
+        modules.remove(modules.elementAt(index));
+        modules.insert(index, newModule);
+      }
+    }
+  }
   final JsonObj config;
   
   late String address = configFetch("address");
